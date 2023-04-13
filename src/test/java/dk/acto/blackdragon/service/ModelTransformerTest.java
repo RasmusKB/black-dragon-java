@@ -22,8 +22,26 @@ public class ModelTransformerTest {
         ModelTransformer<Model, Stats> subject = new ModelTransformer<Model, Stats>() {
             @Override
             public Stats transform(List<Model> model) {
-                return null;
-            }
+
+				Stats retval =  Stats.builder()
+					.evenIds(BigInteger.valueOf(model.count(modelIns ->
+									modelIns.getId() % 2 == 0))
+					)
+					.oddIds(BigInteger.valueOf(model.count(modelIns ->
+									modelIns.getId() % 2 == 1))
+					)
+					.meanCost(BigDecimal.valueOf(model.map(modelIns ->
+									modelIns.getCost()).sum().longValue() / model.length() / 100)
+					)
+					.weightedInventory(BigDecimal.valueOf(model.map(modelIns ->
+									(modelIns.getWeight()* 100) * modelIns.getInventory()).sum().longValue(), 2)
+					)
+					.totalInventory(BigInteger.valueOf(model.map(modelIns ->
+									modelIns.getInventory()).sum().intValue())
+					)
+					.build();
+                return retval;
+             }
         };
 
         Stats result = subject.transform(models);
